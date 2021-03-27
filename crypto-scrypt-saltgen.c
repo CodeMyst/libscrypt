@@ -4,18 +4,35 @@
 #include <errno.h>
 #include <fcntl.h>
 
-/* Disable on Windows, there is no /dev/urandom.
-   Link-time error is better than runtime error. */
-#ifndef _WIN32
-
+#ifdef _WIN32
+#pragma warning(push, 0)
+#include <windows.h>
+#pragma warning(pop)
+#else
 #ifndef S_SPLINT_S /* Including this here triggers a known bug in splint */
 #include <unistd.h>
 #endif
 
 #define RNGDEV "/dev/urandom"
+#endif
 
 int libscrypt_salt_gen(uint8_t *salt, size_t len)
 {
+#ifdef _WIN32
+
+	HCRYPTPROV hProvider;
+
+	if (!CryptAcquireContext(&hProvider, NULL, NULL, PROV_RSA_FULL, CRYPT_VERIFYCONTEXT | CRYPT_SILENT)) {
+		return -1;
+	}
+
+	BOOL res = CryptGenRandom(hProvider, (DWORD) len, salt);
+	CryptReleaseContext(hProvider, 0);
+
+	return res ? 0 : -1;
+
+#else
+
 	unsigned char buf[len];
 	size_t data_read = 0;
 	int urandom = open(RNGDEV, O_RDONLY);
@@ -49,6 +66,6 @@ int libscrypt_salt_gen(uint8_t *salt, size_t len)
 	memcpy(salt, buf, len);
 
 	return 0;
-}
 
 #endif
+}

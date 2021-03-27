@@ -7,11 +7,13 @@
 /* ilog2 for powers of two */
 static uint32_t scrypt_ilog2(uint32_t n)
 {
+#ifndef _WIN32
 #ifndef S_SPLINT_S
 
 	/* Check for a valid power of two */
 	if (n < 2 || (n & (n - 1)))
 		return -1;
+#endif
 #endif
 	uint32_t t = 1;
 	while (((uint32_t)1 << t) < n)
