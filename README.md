@@ -1,5 +1,23 @@
 libscrypt
 =========
+
+Windows
+-------
+
+This is a fork which adds Windows build support.
+
+To get libscrypt on Windows, clone this repo and run these commands:
+
+```sh
+mkdir build
+cd build
+cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_CONFIGURATION_TYPES="Release;Debug;MinSizeRel;RelWithDebInfo" ..
+```
+
+After that open the VS solution `libscrypt.sln` and build in Release. `scrypt.lib` should now be in `build/Release`.
+
+---
+
 Linux scrypt shared library.
 
 Full credit to algorithm designer and example code from Colin Percival here:
